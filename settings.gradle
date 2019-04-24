@@ -1,1 +1,1 @@
-include ':app', ':XViewPagerLib'
+include ':app', ':library'

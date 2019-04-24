@@ -25,25 +25,10 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <com.ashlikun.xviewpager.view.BannerViewPager
-                    android:id="@+id/bannerViewPager"
+                <ImageView
+                    android:id="@+id/imageView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:banner_ratio="1.77"
-                    app:banner_turningTime="4000" />
-
-                <com.ashlikun.xviewpager.ConvenientBanner
-                    android:id="@+id/convenientBanner"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    app:banner_isCanTouchScroll="false"
-                    app:ind_style="ind_zoom" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="10000dp"
-                    android:background="#ff0000"></View>
+                    android:layout_height="200dp" />
 
             </LinearLayout>
         </android.support.v4.widget.NestedScrollView>
