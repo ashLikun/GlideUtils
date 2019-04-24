@@ -22,7 +22,7 @@ dependencies {
 ```
 ### 1.用法
 ```java
-       
+
 ```
 ### 混肴
 glide混淆
