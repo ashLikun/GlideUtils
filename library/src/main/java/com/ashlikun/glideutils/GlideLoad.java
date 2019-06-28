@@ -3,10 +3,12 @@ package com.ashlikun.glideutils;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import android.view.View;
 import android.widget.ImageView;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import com.ashlikun.glideutils.okhttp.ProgressListener;
 import com.ashlikun.glideutils.okhttp.ProgressManage;
@@ -20,6 +22,8 @@ import com.bumptech.glide.load.resource.bitmap.CenterInside;
 import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.CustomViewTarget;
+import com.bumptech.glide.request.target.ImageViewTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.target.ViewTarget;
 
@@ -44,6 +48,7 @@ public final class GlideLoad {
     private ImageView imageView;
     private RequestOptions requestOptions;
     private Object path;
+    private ImageView.ScaleType errorScaleType = ImageView.ScaleType.CENTER_INSIDE;
     private ProgressListener progressListener;
     private RequestListener requestListener;
 
@@ -118,37 +123,67 @@ public final class GlideLoad {
         RequestBuilder<Drawable> requestBuilder = getRequest();
         if (progressListener != null) {
             ProgressManage.add(path, progressListener);
-            requestBuilder.listener(new RequestListener<Drawable>() {
-                @Override
-                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                    if (requestListener != null) {
-                        requestListener.onLoadFailed(e, model, target, isFirstResource);
-                    }
-                    progressListener.onProgress(ProgressManage.getTotalBytesRead(path), ProgressManage.getContentLength(path), true);
-                    ProgressManage.remove(path);
-                    return false;
-                }
-
-                @Override
-                public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                    if (requestListener != null) {
-                        requestListener.onResourceReady(resource, model, target, dataSource, isFirstResource);
-                    }
-                    progressListener.onProgress(ProgressManage.getTotalBytesRead(path), ProgressManage.getContentLength(path), true);
-                    ProgressManage.remove(path);
-                    return false;
-                }
-            });
-        } else {
-            if (requestListener != null) {
-                requestBuilder.listener(requestListener);
-            }
         }
+        requestBuilder.listener(new RequestListener<Drawable>() {
+            boolean isFailedSetScale = false;
+            ImageView.ScaleType oldScaleType = null;
+
+            @Override
+            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                //设置加载失败图为
+                ImageView imageView = getImageView(target);
+                if (imageView != null) {
+                    oldScaleType = imageView.getScaleType();
+                    imageView.setScaleType(errorScaleType);
+                    isFailedSetScale = true;
+                }
+                if (requestListener != null) {
+                    requestListener.onLoadFailed(e, model, target, isFirstResource);
+                }
+                if (progressListener != null) {
+                    progressListener.onProgress(ProgressManage.getTotalBytesRead(path), ProgressManage.getContentLength(path), true);
+                }
+                ProgressManage.remove(path);
+                return false;
+            }
+
+            @Override
+            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                //设置加载失败图为
+                ImageView imageView = getImageView(target);
+                if (isFailedSetScale) {
+                    //还原
+                    imageView.setScaleType(oldScaleType);
+                    oldScaleType = null;
+                    isFailedSetScale = false;
+                }
+                if (requestListener != null) {
+                    requestListener.onResourceReady(resource, model, target, dataSource, isFirstResource);
+                }
+                if (progressListener != null) {
+                    progressListener.onProgress(ProgressManage.getTotalBytesRead(path), ProgressManage.getContentLength(path), true);
+                }
+                ProgressManage.remove(path);
+                return false;
+            }
+        });
         if (requestOptions != null) {
             return requestBuilder.apply(requestOptions);
         } else {
             return requestBuilder;
         }
+    }
+
+    private ImageView getImageView(Target<Drawable> target) {
+        if (target instanceof ImageViewTarget) {
+            return (ImageView) ((ImageViewTarget) target).getView();
+        } else if (target instanceof CustomViewTarget) {
+            View view = ((ImageViewTarget) target).getView();
+            if (view instanceof ImageView) {
+                return imageView = ((ImageView) view);
+            }
+        }
+        return null;
     }
 
     private RequestBuilder<Drawable> getRequest() {

@@ -1,8 +1,9 @@
 package com.ashlikun.xviewpager.simple;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.ashlikun.glideutils.GlideUtils;
 
@@ -19,9 +20,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        GlideUtils.setErrorRes(R.mipmap.ic_launcher);
         setContentView(R.layout.activity_main);
         ImageView imageView = findViewById(R.id.imageView);
-        GlideUtils.show(imageView, RESURL[0]);
+        GlideUtils.show(imageView, "");
     }
 
 

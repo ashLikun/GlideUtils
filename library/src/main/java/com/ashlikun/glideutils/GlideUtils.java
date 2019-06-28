@@ -2,8 +2,9 @@ package com.ashlikun.glideutils;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.support.v4.app.Fragment;
 import android.widget.ImageView;
+
+import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.cache.DiskCache;
@@ -40,7 +41,6 @@ import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 public class GlideUtils {
 
     private static boolean DEBUG;
-    private static String BASE_URL;
     private static int errorRes = R.drawable.material_default_image_1_1;
     private static int placeholderRes = R.color.glide_placeholder_color;
 
@@ -61,23 +61,10 @@ public class GlideUtils {
         GlideUtils.DEBUG = DEBUG;
     }
 
-    /**
-     * 设置域名，当网络文件不是以Http打头的时候会加上
-     *
-     * @param baseUrl
-     */
-    public static void setBaseUrl(String baseUrl) {
-        GlideUtils.BASE_URL = baseUrl;
-    }
-
-
     public static boolean isDEBUG() {
         return DEBUG;
     }
 
-    public static String getBaseUrl() {
-        return BASE_URL;
-    }
 
     public static int getErrorRes() {
         return errorRes;
@@ -186,10 +173,6 @@ public class GlideUtils {
                     res = (String) url;
                 } else if (((String) url).startsWith("/storage") || ((String) url).startsWith("storage") || ((String) url).startsWith("/data") || ((String) url).startsWith("data")) {
                     res = (String) url;
-                } else if (((String) url).startsWith("/")) {
-                    res = getBaseUrl() + url;
-                } else {
-                    res = getBaseUrl() + "/" + url;
                 }
             }
             return res;
