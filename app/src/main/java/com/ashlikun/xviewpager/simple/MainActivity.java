@@ -1,9 +1,8 @@
 package com.ashlikun.xviewpager.simple;
 
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.ashlikun.glideutils.GlideUtils;
 
