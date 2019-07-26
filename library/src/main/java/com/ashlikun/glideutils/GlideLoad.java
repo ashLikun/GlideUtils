@@ -130,9 +130,10 @@ public final class GlideLoad {
                 //设置加载失败图为
                 ImageView imageView = getImageView(target);
                 if (imageView != null) {
+                    ImageView.ScaleType old = imageView.getScaleType();
                     imageView.setScaleType(errorScaleType);
                     imageView.setTag(999998988, true);
-                    imageView.setTag(999998989, imageView.getScaleType());
+                    imageView.setTag(999998989, old);
                 }
                 if (requestListener != null) {
                     requestListener.onLoadFailed(e, model, target, isFirstResource);
