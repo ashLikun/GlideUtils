@@ -124,17 +124,15 @@ public final class GlideLoad {
             ProgressManage.add(path, progressListener);
         }
         requestBuilder.listener(new RequestListener<Drawable>() {
-            boolean isFailedSetScale = false;
-            ImageView.ScaleType oldScaleType = null;
 
             @Override
             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                 //设置加载失败图为
                 ImageView imageView = getImageView(target);
                 if (imageView != null) {
-                    oldScaleType = imageView.getScaleType();
                     imageView.setScaleType(errorScaleType);
-                    isFailedSetScale = true;
+                    imageView.setTag(999998988, true);
+                    imageView.setTag(999998989, imageView.getScaleType());
                 }
                 if (requestListener != null) {
                     requestListener.onLoadFailed(e, model, target, isFirstResource);
@@ -150,11 +148,19 @@ public final class GlideLoad {
             public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
                 //设置加载失败图为
                 ImageView imageView = getImageView(target);
-                if (isFailedSetScale) {
+                boolean isFailedSetScale = false;
+                if (imageView.getTag(999998988) != null) {
+                    isFailedSetScale = (boolean) imageView.getTag(999998988);
+                }
+                ImageView.ScaleType oldScaleType = null;
+                if (imageView.getTag(999998989) != null) {
+                    oldScaleType = (ImageView.ScaleType) imageView.getTag(999998989);
+                }
+                if (isFailedSetScale && oldScaleType != null) {
                     //还原
                     imageView.setScaleType(oldScaleType);
-                    oldScaleType = null;
-                    isFailedSetScale = false;
+                    imageView.setTag(999998988, null);
+                    imageView.setTag(999998989, null);
                 }
                 if (requestListener != null) {
                     requestListener.onResourceReady(resource, model, target, dataSource, isFirstResource);
