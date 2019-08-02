@@ -42,7 +42,10 @@ public class GlideUtils {
     private static boolean DEBUG;
     private static int errorRes = R.drawable.material_default_image_1_1;
     private static int placeholderRes = R.color.glide_placeholder_color;
-
+    //错误图的缩放类型
+    private static ImageView.ScaleType errorScaleType = ImageView.ScaleType.CENTER_INSIDE;
+    //展位图的缩放类型
+    private static ImageView.ScaleType placeholderScaleType = ImageView.ScaleType.CENTER_INSIDE;
 
     static DiskLruCacheFactory diskLruCacheFactory = null;
 
@@ -89,6 +92,22 @@ public class GlideUtils {
      */
     public static void setPlaceholderRes(int placeholderRes) {
         GlideUtils.placeholderRes = placeholderRes;
+    }
+
+    public static ImageView.ScaleType getErrorScaleType() {
+        return errorScaleType;
+    }
+
+    public static void setErrorScaleType(ImageView.ScaleType errorScaleType) {
+        GlideUtils.errorScaleType = errorScaleType;
+    }
+
+    public static ImageView.ScaleType getPlaceholderScaleType() {
+        return placeholderScaleType;
+    }
+
+    public static void setPlaceholderScaleType(ImageView.ScaleType placeholderScaleType) {
+        GlideUtils.placeholderScaleType = placeholderScaleType;
     }
 
     /**
