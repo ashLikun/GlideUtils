@@ -118,9 +118,11 @@ public final class GlideLoad {
         //设置缩放类型
         if (imageView != null) {
             ImageView.ScaleType old = imageView.getScaleType();
-            imageView.setScaleType(placeholderScaleType);
-            imageView.setTag(999998988, true);
-            imageView.setTag(999998989, old);
+            if (old != placeholderScaleType) {
+                imageView.setScaleType(placeholderScaleType);
+                imageView.setTag(999998988, true);
+                imageView.setTag(999998989, old);
+            }
         }
         return requestBuilder.into(view);
     }
@@ -131,9 +133,11 @@ public final class GlideLoad {
         ImageView imageView = getImageView(target);
         if (imageView != null) {
             ImageView.ScaleType old = imageView.getScaleType();
-            imageView.setScaleType(placeholderScaleType);
-            imageView.setTag(999998988, true);
-            imageView.setTag(999998989, old);
+            if (old != placeholderScaleType) {
+                imageView.setScaleType(placeholderScaleType);
+                imageView.setTag(999998988, true);
+                imageView.setTag(999998989, old);
+            }
         }
         return target;
     }
@@ -152,9 +156,11 @@ public final class GlideLoad {
                 ImageView imageView = getImageView(target);
                 if (imageView != null) {
                     ImageView.ScaleType old = imageView.getScaleType();
-                    imageView.setScaleType(errorScaleType);
-                    imageView.setTag(999998988, true);
-                    imageView.setTag(999998989, old);
+                    if (old != errorScaleType) {
+                        imageView.setScaleType(errorScaleType);
+                        imageView.setTag(999998988, true);
+                        imageView.setTag(999998989, old);
+                    }
                 }
                 if (requestListener != null) {
                     requestListener.onLoadFailed(e, model, target, isFirstResource);
@@ -168,7 +174,7 @@ public final class GlideLoad {
 
             @Override
             public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                //设置加载失败图为
+                //还原图片缩放类型
                 ImageView imageView = getImageView(target);
                 boolean isFailedSetScale = false;
                 if (imageView.getTag(999998988) != null) {
