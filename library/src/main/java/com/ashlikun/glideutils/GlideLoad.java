@@ -211,9 +211,14 @@ public final class GlideLoad {
 
     private ImageView getImageView(Target<Drawable> target) {
         if (target instanceof ImageViewTarget) {
-            return (ImageView) ((ImageViewTarget) target).getView();
+            return imageView = (ImageView) ((ImageViewTarget) target).getView();
         } else if (target instanceof CustomViewTarget) {
-            View view = ((ImageViewTarget) target).getView();
+            View view = ((CustomViewTarget) target).getView();
+            if (view instanceof ImageView) {
+                return imageView = ((ImageView) view);
+            }
+        } else if (target instanceof ViewTarget) {
+            View view = ((ViewTarget) target).getView();
             if (view instanceof ImageView) {
                 return imageView = ((ImageView) view);
             }
