@@ -11,8 +11,6 @@ import android.widget.ImageView;
 
 import com.ashlikun.glideutils.okhttp.ProgressListener;
 import com.ashlikun.glideutils.okhttp.ProgressManage;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
@@ -114,7 +112,7 @@ public final class GlideLoad {
 
     public ViewTarget<ImageView, Drawable> show(ImageView view) {
         this.imageView = view;
-        RequestBuilder<Drawable> requestBuilder = show();
+        GlideRequest<Drawable> requestBuilder = show();
         //设置缩放类型
         if (imageView != null) {
             ImageView.ScaleType old = imageView.getScaleType();
@@ -128,7 +126,7 @@ public final class GlideLoad {
     }
 
     public Target<Drawable> show(Target view) {
-        RequestBuilder<Drawable> requestBuilder = show();
+        GlideRequest<Drawable> requestBuilder = show();
         Target<Drawable> target = requestBuilder.into(view);
         ImageView imageView = getImageView(target);
         if (imageView != null) {
@@ -142,8 +140,8 @@ public final class GlideLoad {
         return target;
     }
 
-    private RequestBuilder<Drawable> show() {
-        RequestBuilder<Drawable> requestBuilder = getRequest();
+    private GlideRequest<Drawable> show() {
+        GlideRequest<Drawable> requestBuilder = getRequest();
         if (progressListener != null) {
             ProgressManage.add(path, progressListener);
         }
@@ -226,17 +224,17 @@ public final class GlideLoad {
         return null;
     }
 
-    private RequestBuilder<Drawable> getRequest() {
+    private GlideRequest<Drawable> getRequest() {
         if (activityF != null) {
-            return Glide.with(activityF).load(GlideUtils.getHttpFileUrl(path));
+            return GlideApp.with(activityF).load(GlideUtils.getHttpFileUrl(path));
         } else if (activity != null) {
-            return Glide.with(activity).load(GlideUtils.getHttpFileUrl(path));
+            return GlideApp.with(activity).load(GlideUtils.getHttpFileUrl(path));
         } else if (fragment != null) {
-            return Glide.with(fragment).load(GlideUtils.getHttpFileUrl(path));
+            return GlideApp.with(fragment).load(GlideUtils.getHttpFileUrl(path));
         } else if (context != null) {
-            return Glide.with(context).load(GlideUtils.getHttpFileUrl(path));
+            return GlideApp.with(context).load(GlideUtils.getHttpFileUrl(path));
         } else if (imageView != null) {
-            return Glide.with(imageView).load(GlideUtils.getHttpFileUrl(path));
+            return GlideApp.with(imageView).load(GlideUtils.getHttpFileUrl(path));
         }
         return null;
     }

@@ -1,11 +1,13 @@
 package com.ashlikun.glideutils;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.cache.DiskCache;
 import com.bumptech.glide.load.engine.cache.DiskLruCacheFactory;
 import com.bumptech.glide.load.engine.cache.InternalCacheDiskCacheFactory;
@@ -13,18 +15,14 @@ import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.target.ViewTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import java.io.File;
 import java.lang.reflect.Field;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 
@@ -152,32 +150,40 @@ public class GlideUtils {
 
     /**
      * 下载
-     *
-     * @param url
-     * @param downloadCallbacl
      */
     public static void downloadBitmap(final Context context, final String url, final OnDownloadCallback downloadCallbacl) {
-        Observable.create(new ObservableOnSubscribe<File>() {
+        GlideApp.with(context).download(getHttpFileUrl(url)).into(new CustomTarget<File>() {
             @Override
-            public void subscribe(ObservableEmitter<File> e) throws Exception {
-                File file = Glide.with(context).download(getHttpFileUrl(url))
-                        .submit().get();
-                e.onNext(file);
+            public void onResourceReady(@NonNull File resource, @Nullable Transition<? super File> transition) {
+                downloadCallbacl.onCall(resource);
             }
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<File>() {
-                    @Override
-                    public void accept(File file) {
-                        downloadCallbacl.onCall(file);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) {
-                        downloadCallbacl.onCall(null);
-                    }
-                });
 
+            @Override
+            public void onLoadCleared(@Nullable Drawable placeholder) {
+                downloadCallbacl.onCall(null);
+            }
+        });
+    }
+
+    /**
+     * 下载文件
+     */
+    public static void getFile(final Context context, final String url, final Target<File> downloadCallbacl) {
+        GlideApp.with(context).asFile().load(getHttpFileUrl(url)).into(downloadCallbacl);
+    }
+
+    /**
+     * 下载Bitmap
+     */
+    public static void getBitmap(final Context context, final String url, final Target<Bitmap> downloadCallbacl) {
+        GlideApp.with(context).asBitmap().load(getHttpFileUrl(url)).into(downloadCallbacl);
+    }
+
+    /**
+     * 下载Draweable  一般如果不知道是Bitmap还是Drawable就用这个
+     */
+    public static void getDrawable(final Context context, final String url, final Target<Drawable> downloadCallbacl) {
+        GlideApp.with(context).asDrawable().load(getHttpFileUrl(url)).into(downloadCallbacl);
     }
 
     /**
@@ -204,7 +210,7 @@ public class GlideUtils {
      * @return
      */
     public static RequestOptions getRoundedOptions(int radius) {
-        return new RequestOptions().transforms(new CenterCrop(),
+        return new RequestOptions().transform(new CenterCrop(),
                 new RoundedCornersTransformation(radius, 0));
     }
 
@@ -214,7 +220,7 @@ public class GlideUtils {
      * @return
      */
     public static RequestOptions getCircleOptions() {
-        return new RequestOptions().transforms(new CenterCrop(),
+        return new RequestOptions().transform(new CenterCrop(),
                 new CircleCrop());
     }
 
