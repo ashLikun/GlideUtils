@@ -14,6 +14,18 @@ import com.bumptech.glide.request.target.CustomTarget;
  */
 
 public abstract class OnCustomTarget<T> extends CustomTarget<T> {
+
+    public OnCustomTarget(int width, int height) {
+        super(width, height);
+    }
+
+    public OnCustomTarget(int size) {
+        super(size, size);
+    }
+
+    public OnCustomTarget() {
+    }
+
     @Override
     public void onLoadCleared(@Nullable Drawable placeholder) {
 
