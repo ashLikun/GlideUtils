@@ -1,7 +1,7 @@
 package com.ashlikun.glideutils;
 
 import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.bumptech.glide.request.target.CustomTarget;
 

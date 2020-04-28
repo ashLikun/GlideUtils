@@ -21,8 +21,8 @@ android {
     }
 }
 dependencies {
-    compileOnly 'com.github.bumptech.glide:glide:4.9.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
+    compileOnly 'com.github.bumptech.glide:glide:4.11.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
     compileOnly 'jp.wasabeef:glide-transformations:4+'
     compileOnly 'com.squareup.okhttp3:okhttp:3.12.0'
     compileOnly rootProject.ext.v4Version
