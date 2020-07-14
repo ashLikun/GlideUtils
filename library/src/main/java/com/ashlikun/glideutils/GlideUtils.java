@@ -3,10 +3,11 @@ package com.ashlikun.glideutils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.widget.ImageView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import android.widget.ImageView;
 
 import com.bumptech.glide.load.engine.cache.DiskCache;
 import com.bumptech.glide.load.engine.cache.DiskLruCacheFactory;
@@ -159,8 +160,14 @@ public class GlideUtils {
             }
 
             @Override
-            public void onLoadCleared(@Nullable Drawable placeholder) {
+            public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                super.onLoadFailed(errorDrawable);
                 downloadCallbacl.onCall(null);
+            }
+
+            @Override
+            public void onLoadCleared(@Nullable Drawable placeholder) {
+
             }
         });
     }
