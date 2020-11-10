@@ -1,5 +1,6 @@
 package com.ashlikun.glideutils.okhttp;
 
+import com.ashlikun.glideutils.GlideUtils;
 import com.bumptech.glide.load.Options;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.ModelLoader;
@@ -42,6 +43,9 @@ public class OkHttpUrlLoader implements ModelLoader<GlideUrl, InputStream> {
         private Call.Factory client;
 
         private static Call.Factory getInternalClient() {
+            if (GlideUtils.internalClient != null) {
+                return GlideUtils.internalClient;
+            }
             if (internalClient == null) {
                 synchronized (Factory.class) {
                     if (internalClient == null) {

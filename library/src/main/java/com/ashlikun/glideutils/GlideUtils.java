@@ -25,6 +25,8 @@ import java.io.File;
 import java.lang.reflect.Field;
 
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
+import okhttp3.Call;
+import okhttp3.OkHttpClient;
 
 
 /**
@@ -47,6 +49,11 @@ public class GlideUtils {
     private static ImageView.ScaleType placeholderScaleType = ImageView.ScaleType.CENTER_INSIDE;
 
     static DiskLruCacheFactory diskLruCacheFactory = null;
+    public static volatile Call.Factory internalClient;
+
+    public static void init(OkHttpClient okHttpClient) {
+        internalClient = okHttpClient;
+    }
 
     /**
      * 设置缓存,在application设置
