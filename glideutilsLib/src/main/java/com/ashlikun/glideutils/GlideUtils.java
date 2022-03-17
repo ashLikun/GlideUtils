@@ -160,7 +160,7 @@ public class GlideUtils {
      * 下载
      */
     public static void downloadBitmap(final Context context, final String url, final OnDownloadCallback downloadCallbacl) {
-        GlideApp.with(context).download(getHttpFileUrl(url)).into(new CustomTarget<File>() {
+        GlideApp.with(context).download(url == null ? "" : url).into(new CustomTarget<File>() {
             @Override
             public void onResourceReady(@NonNull File resource, @Nullable Transition<? super File> transition) {
                 downloadCallbacl.onCall(resource);
@@ -183,39 +183,35 @@ public class GlideUtils {
      * 下载文件
      */
     public static void getFile(final Context context, final String url, final Target<File> downloadCallbacl) {
-        GlideApp.with(context).asFile().load(getHttpFileUrl(url)).into(downloadCallbacl);
+        GlideApp.with(context).asFile().load(url == null ? "" : url).into(downloadCallbacl);
     }
 
     /**
      * 下载Bitmap
      */
     public static void getBitmap(final Context context, final String url, final Target<Bitmap> downloadCallbacl) {
-        GlideApp.with(context).asBitmap().load(getHttpFileUrl(url)).into(downloadCallbacl);
+        GlideApp.with(context).asBitmap().load(url == null ? "" : url).into(downloadCallbacl);
     }
 
     /**
      * 下载Draweable  一般如果不知道是Bitmap还是Drawable就用这个
      */
     public static void getDrawable(final Context context, final String url, final Target<Drawable> downloadCallbacl) {
-        GlideApp.with(context).asDrawable().load(getHttpFileUrl(url)).into(downloadCallbacl);
+        GlideApp.with(context).asDrawable().load(url == null ? "" : url).into(downloadCallbacl);
     }
 
     /**
-     * 对网络资源文件判断路径 如果是已http开头的就返回这个值 否则在前面加上ORG
+     * 是否是网络url或者文件
      */
-    public static Object getHttpFileUrl(Object url) {
-        if (url instanceof String) {
-            String res = "";
-            if (url != null) {
-                if (((String) url).startsWith("http://") || ((String) url).startsWith("https://")) {
-                    res = (String) url;
-                } else if (((String) url).startsWith("/storage") || ((String) url).startsWith("storage") || ((String) url).startsWith("/data") || ((String) url).startsWith("data")) {
-                    res = (String) url;
-                }
+    public static boolean isHttpOrFileUrl(String url) {
+        if (url != null) {
+            if (url.startsWith("http://") || url.startsWith("https://")) {
+                return true;
+            } else if (url.startsWith("/storage") || url.startsWith("storage") || url.startsWith("/data") || url.startsWith("data")) {
+                return true;
             }
-            return res;
         }
-        return url;
+        return false;
     }
 
     /**

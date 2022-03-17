@@ -3,11 +3,12 @@ package com.ashlikun.glideutils;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.view.View;
+import android.widget.ImageView;
+
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import android.view.View;
-import android.widget.ImageView;
 
 import com.ashlikun.glideutils.okhttp.ProgressListener;
 import com.ashlikun.glideutils.okhttp.ProgressManage;
@@ -106,7 +107,7 @@ public final class GlideLoad {
     }
 
     public GlideLoad load(Object path) {
-        this.path = path;
+        this.path = path == null ? "" : path;
         return this;
     }
 
@@ -226,15 +227,15 @@ public final class GlideLoad {
 
     private GlideRequest<Drawable> getRequest() {
         if (activityF != null) {
-            return GlideApp.with(activityF).load(GlideUtils.getHttpFileUrl(path));
+            return GlideApp.with(activityF).load(path);
         } else if (activity != null) {
-            return GlideApp.with(activity).load(GlideUtils.getHttpFileUrl(path));
+            return GlideApp.with(activity).load(path);
         } else if (fragment != null) {
-            return GlideApp.with(fragment).load(GlideUtils.getHttpFileUrl(path));
+            return GlideApp.with(fragment).load(path);
         } else if (context != null) {
-            return GlideApp.with(context).load(GlideUtils.getHttpFileUrl(path));
+            return GlideApp.with(context).load(path);
         } else if (imageView != null) {
-            return GlideApp.with(imageView).load(GlideUtils.getHttpFileUrl(path));
+            return GlideApp.with(imageView).load(path);
         }
         return null;
     }

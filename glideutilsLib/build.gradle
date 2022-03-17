@@ -9,6 +9,9 @@ android {
         versionCode rootProject.ext.versionCode
         versionName rootProject.ext.versionName
     }
+    buildFeatures {
+        buildConfig = false
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -25,6 +28,5 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
     compileOnly 'jp.wasabeef:glide-transformations:4+'
     compileOnly 'com.squareup.okhttp3:okhttp:3.12.0'
-    compileOnly rootProject.ext.v4Version
 }
 apply from: '../maven.gradle'
