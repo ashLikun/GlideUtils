@@ -1,8 +1,9 @@
 package com.ashlikun.xviewpager.simple;
 
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.widget.ImageView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.ashlikun.glideutils.GlideUtils;
 
@@ -22,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
         GlideUtils.setErrorRes(R.mipmap.ic_launcher);
         setContentView(R.layout.activity_main);
         ImageView imageView = findViewById(R.id.imageView);
-        GlideUtils.show(imageView, "");
+        GlideUtils.show(imageView, "https://vinkalife-1255635395.cos.ap-hongkong.myqcloud.com/img/news/113/0ac58d26-d698-11ec-9e0f-5254004a9820.jpg");
     }
 
 
