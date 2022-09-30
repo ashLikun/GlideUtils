@@ -141,7 +141,7 @@ public final class GlideLoad {
     public Target<Drawable> show(Target view) {
         GlideRequest<Drawable> requestBuilder = builder();
         Target<Drawable> target = requestBuilder.into(view);
-        getImageView(target);
+        imageView = GlideUtils.getImageView(target);
         setScaleType();
         return target;
     }
@@ -175,7 +175,7 @@ public final class GlideLoad {
             @Override
             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                 //设置加载失败图为
-                ImageView imageView = getImageView(target);
+                ImageView imageView = GlideUtils.getImageView(target);
                 if (imageView != null) {
                     ImageView.ScaleType old = imageView.getScaleType();
                     if (old != errorScaleType) {
@@ -195,7 +195,7 @@ public final class GlideLoad {
             @Override
             public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
                 //还原图片缩放类型
-                ImageView imageView = getImageView(target);
+                ImageView imageView = GlideUtils.getImageView(target);
                 if (imageView != null) {
                     boolean isFailedSetScale = false;
                     if (imageView.getTag(999998988) != null) {
@@ -233,13 +233,6 @@ public final class GlideLoad {
         return requestBuilder;
     }
 
-    private ImageView getImageView(Target<Drawable> target) {
-        if (imageView == null) {
-            return imageView = GlideUtils.getImageView(target);
-        } else {
-            return imageView;
-        }
-    }
 
     private GlideRequest<Drawable> getRequest() {
         if (activityF != null) {
