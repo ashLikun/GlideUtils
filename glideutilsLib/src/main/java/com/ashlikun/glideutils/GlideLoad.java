@@ -3,7 +3,6 @@ package com.ashlikun.glideutils;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.view.View;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
@@ -17,8 +16,6 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.CustomViewTarget;
-import com.bumptech.glide.request.target.ImageViewTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.target.ViewTarget;
 
@@ -48,9 +45,11 @@ public final class GlideLoad {
     private ImageView.ScaleType errorScaleType = GlideUtils.getErrorScaleType();
     //展位图的缩放类型
     private ImageView.ScaleType placeholderScaleType = GlideUtils.getPlaceholderScaleType();
+
     private ProgressListener progressListener;
     private List<RequestListener> requestListener;
 
+    private GlideRequest<Drawable> requestBuilder = null;
 
     private GlideLoad() {
     }
@@ -135,21 +134,19 @@ public final class GlideLoad {
         this.imageView = view;
         GlideRequest<Drawable> requestBuilder = builder();
         //设置缩放类型
-        if (imageView != null) {
-            ImageView.ScaleType old = imageView.getScaleType();
-            if (old != placeholderScaleType) {
-                imageView.setScaleType(placeholderScaleType);
-                imageView.setTag(999998988, true);
-                imageView.setTag(999998989, old);
-            }
-        }
+        setScaleType();
         return requestBuilder.into(view);
     }
 
     public Target<Drawable> show(Target view) {
         GlideRequest<Drawable> requestBuilder = builder();
         Target<Drawable> target = requestBuilder.into(view);
-        ImageView imageView = getImageView(target);
+        getImageView(target);
+        setScaleType();
+        return target;
+    }
+
+    public void setScaleType() {
         if (imageView != null) {
             ImageView.ScaleType old = imageView.getScaleType();
             if (old != placeholderScaleType) {
@@ -158,7 +155,6 @@ public final class GlideLoad {
                 imageView.setTag(999998989, old);
             }
         }
-        return target;
     }
 
     /**
@@ -167,7 +163,10 @@ public final class GlideLoad {
      * @return
      */
     public GlideRequest<Drawable> builder() {
-        GlideRequest<Drawable> requestBuilder = getRequest();
+        if (requestBuilder != null) {
+            return requestBuilder;
+        }
+        requestBuilder = getRequest();
         if (progressListener != null) {
             ProgressManage.add(path, progressListener);
         }
@@ -240,7 +239,6 @@ public final class GlideLoad {
         } else {
             return imageView;
         }
-
     }
 
     private GlideRequest<Drawable> getRequest() {
