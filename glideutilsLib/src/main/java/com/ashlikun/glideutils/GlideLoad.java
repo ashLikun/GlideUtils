@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.ashlikun.glideutils.okhttp.ProgressListener;
 import com.ashlikun.glideutils.okhttp.ProgressManage;
+import com.bumptech.glide.TransitionOptions;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
@@ -20,6 +21,9 @@ import com.bumptech.glide.request.target.CustomViewTarget;
 import com.bumptech.glide.request.target.ImageViewTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.target.ViewTarget;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author　　: 李坤
@@ -38,13 +42,14 @@ public final class GlideLoad {
 
     private ImageView imageView;
     private RequestOptions requestOptions;
+    private TransitionOptions transitionOptions;
     private Object path;
     //错误图的缩放类型
     private ImageView.ScaleType errorScaleType = GlideUtils.getErrorScaleType();
     //展位图的缩放类型
     private ImageView.ScaleType placeholderScaleType = GlideUtils.getPlaceholderScaleType();
     private ProgressListener progressListener;
-    private RequestListener requestListener;
+    private List<RequestListener> requestListener;
 
 
     private GlideLoad() {
@@ -96,13 +101,28 @@ public final class GlideLoad {
         return this;
     }
 
+    public GlideLoad transition(TransitionOptions transitionOptions) {
+        this.transitionOptions = transitionOptions;
+        return this;
+    }
+
     public GlideLoad progressListener(ProgressListener progressListener) {
         this.progressListener = progressListener;
         return this;
     }
 
-    public GlideLoad requestListener(RequestListener requestListener) {
-        this.requestListener = requestListener;
+    public GlideLoad listener(RequestListener listener) {
+        this.requestListener = new ArrayList<>();
+        return addListener(listener);
+    }
+
+    public GlideLoad addListener(RequestListener listener) {
+        if (listener != null) {
+            if (requestListener == null) {
+                this.requestListener = new ArrayList<>();
+            }
+            this.requestListener.add(listener);
+        }
         return this;
     }
 
@@ -113,7 +133,7 @@ public final class GlideLoad {
 
     public ViewTarget<ImageView, Drawable> show(ImageView view) {
         this.imageView = view;
-        GlideRequest<Drawable> requestBuilder = show();
+        GlideRequest<Drawable> requestBuilder = builder();
         //设置缩放类型
         if (imageView != null) {
             ImageView.ScaleType old = imageView.getScaleType();
@@ -127,7 +147,7 @@ public final class GlideLoad {
     }
 
     public Target<Drawable> show(Target view) {
-        GlideRequest<Drawable> requestBuilder = show();
+        GlideRequest<Drawable> requestBuilder = builder();
         Target<Drawable> target = requestBuilder.into(view);
         ImageView imageView = getImageView(target);
         if (imageView != null) {
@@ -141,14 +161,18 @@ public final class GlideLoad {
         return target;
     }
 
-    private GlideRequest<Drawable> show() {
+    /**
+     * 构建一个GlideRequest 可以再次扩展
+     *
+     * @return
+     */
+    public GlideRequest<Drawable> builder() {
         GlideRequest<Drawable> requestBuilder = getRequest();
         if (progressListener != null) {
             ProgressManage.add(path, progressListener);
         }
 
         requestBuilder.listener(new RequestListener<Drawable>() {
-
             @Override
             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                 //设置加载失败图为
@@ -161,13 +185,11 @@ public final class GlideLoad {
                         imageView.setTag(999998989, old);
                     }
                 }
-                if (requestListener != null) {
-                    requestListener.onLoadFailed(e, model, target, isFirstResource);
-                }
                 if (progressListener != null) {
                     progressListener.onProgress(ProgressManage.getTotalBytesRead(path), ProgressManage.getContentLength(path), true);
+                    ProgressManage.remove(path);
                 }
-                ProgressManage.remove(path);
+
                 return false;
             }
 
@@ -191,38 +213,34 @@ public final class GlideLoad {
                         imageView.setTag(999998989, null);
                     }
                 }
-                if (requestListener != null) {
-                    requestListener.onResourceReady(resource, model, target, dataSource, isFirstResource);
-                }
                 if (progressListener != null) {
                     progressListener.onProgress(ProgressManage.getTotalBytesRead(path), ProgressManage.getContentLength(path), true);
+                    ProgressManage.remove(path);
                 }
-                ProgressManage.remove(path);
                 return false;
             }
         });
-        if (requestOptions != null) {
-            return requestBuilder.apply(requestOptions);
-        } else {
-            return requestBuilder;
+        if (requestListener != null) {
+            for (RequestListener listener : requestListener) {
+                requestBuilder.addListener(listener);
+            }
         }
+        if (requestOptions != null) {
+            requestBuilder = requestBuilder.apply(requestOptions);
+        }
+        if (transitionOptions != null) {
+            requestBuilder = requestBuilder.transition(transitionOptions);
+        }
+        return requestBuilder;
     }
 
     private ImageView getImageView(Target<Drawable> target) {
-        if (target instanceof ImageViewTarget) {
-            return imageView = (ImageView) ((ImageViewTarget) target).getView();
-        } else if (target instanceof CustomViewTarget) {
-            View view = ((CustomViewTarget) target).getView();
-            if (view instanceof ImageView) {
-                return imageView = ((ImageView) view);
-            }
-        } else if (target instanceof ViewTarget) {
-            View view = ((ViewTarget) target).getView();
-            if (view instanceof ImageView) {
-                return imageView = ((ImageView) view);
-            }
+        if (imageView == null) {
+            return imageView = GlideUtils.getImageView(target);
+        } else {
+            return imageView;
         }
-        return null;
+
     }
 
     private GlideRequest<Drawable> getRequest() {

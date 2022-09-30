@@ -3,6 +3,7 @@ package com.ashlikun.glideutils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.view.View;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,8 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.target.CustomViewTarget;
+import com.bumptech.glide.request.target.ImageViewTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.target.ViewTarget;
 import com.bumptech.glide.request.transition.Transition;
@@ -330,4 +333,20 @@ public class GlideUtils {
         return size;
     }
 
+    public static ImageView getImageView(Target<Drawable> target) {
+        if (target instanceof ImageViewTarget) {
+            return (ImageView) ((ImageViewTarget) target).getView();
+        } else if (target instanceof CustomViewTarget) {
+            View view = ((CustomViewTarget) target).getView();
+            if (view instanceof ImageView) {
+                return ((ImageView) view);
+            }
+        } else if (target instanceof ViewTarget) {
+            View view = ((ViewTarget) target).getView();
+            if (view instanceof ImageView) {
+                return ((ImageView) view);
+            }
+        }
+        return null;
+    }
 }
