@@ -5,6 +5,7 @@ import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.ashlikun.glideutils.GlideLoad;
 import com.ashlikun.glideutils.GlideUtils;
 
 public class MainActivity extends AppCompatActivity {
@@ -20,10 +21,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        GlideUtils.init(getApplicationContext(),null);
         GlideUtils.setErrorRes(R.mipmap.ic_launcher);
         setContentView(R.layout.activity_main);
         ImageView imageView = findViewById(R.id.imageView);
-        GlideUtils.show(imageView, "https://vinkalife-1255635395.cos.ap-hongkong.myqcloud.com/app/img/model/model-2.png");
+        GlideLoad.with(imageView)
+                .load("https://vinkalife-1255635395.cos.ap-hongkong.myqcloud.com/app/img/model/model-2.png")
+                .show(imageView);
     }
 
 

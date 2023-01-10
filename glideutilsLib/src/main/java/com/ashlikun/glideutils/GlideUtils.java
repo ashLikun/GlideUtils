@@ -1,5 +1,6 @@
 package com.ashlikun.glideutils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -9,6 +10,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import com.bumptech.glide.load.engine.cache.DiskCache;
 import com.bumptech.glide.load.engine.cache.DiskLruCacheFactory;
@@ -44,6 +46,7 @@ import okhttp3.OkHttpClient;
 public class GlideUtils {
 
     private static boolean DEBUG;
+    private static Context context;
     private static int errorRes = R.drawable.material_default_image_1_1;
     private static int placeholderRes = R.color.glide_placeholder_color;
     //错误图的缩放类型
@@ -54,7 +57,8 @@ public class GlideUtils {
     static DiskLruCacheFactory diskLruCacheFactory = null;
     public static volatile Call.Factory internalClient;
 
-    public static void init(OkHttpClient okHttpClient) {
+    public static void init(Context context, OkHttpClient okHttpClient) {
+        GlideUtils.context = context;
         internalClient = okHttpClient;
     }
 
@@ -120,59 +124,46 @@ public class GlideUtils {
     }
 
     /**
-     * 给ImageView 设置网络图片（圆形）
-     */
-    public static ViewTarget<ImageView, Drawable> showCircle(ImageView imageView, Object path) {
-        return show(imageView, path, getCircleOptions());
-    }
-
-    public static ViewTarget<ImageView, Drawable> show(ImageView imageView, Object path) {
-        return show(imageView, path, null);
-    }
-
-    public static ViewTarget<ImageView, Drawable> show(ImageView view, Object path, RequestOptions requestOptions) {
-        return GlideLoad.with(view)
-                .load(path)
-                .options(requestOptions)
-                .show(view);
-    }
-
-    public static Target<Drawable> show(Context context, Target view, Object path, RequestOptions requestOptions) {
-        return GlideLoad.with(context)
-                .load(path)
-                .options(requestOptions)
-                .show(view);
-    }
-
-    public static ViewTarget<ImageView, Drawable> show(Fragment fragment, ImageView view, Object path, RequestOptions requestOptions) {
-        return GlideLoad.with(fragment)
-                .load(path)
-                .options(requestOptions)
-                .show(view);
-    }
-
-    public static Target<Drawable> show(Fragment fragment, Target view, Object path, RequestOptions requestOptions) {
-        return GlideLoad.with(fragment)
-                .load(path)
-                .options(requestOptions)
-                .show(view);
-    }
-
-
-    /**
      * 下载
      */
-    public static void downloadBitmap(final Context context, final String url, final OnDownloadCallback downloadCallbacl) {
-        GlideApp.with(context).download(url == null ? "" : url).into(new CustomTarget<File>() {
+    public static void downloadBitmap(Object context, String url, OnDownloadCallback downloadCallbacl) {
+        downloadFile(context, url, downloadCallbacl);
+    }
+
+    /**
+     * 加载缓存
+     */
+    public static void downloadCache(Object context, String url, OnDownloadCallback downloadCallbacl) {
+        File file = getCache(url);
+        if (file == null || !file.exists()) {
+            //没有缓存，加载缓存
+            downloadFile(context, url, downloadCallbacl);
+        } else {
+            //已经有缓存就使用缓存回调
+            if (downloadCallbacl != null) {
+                downloadCallbacl.onCall(file);
+            }
+        }
+    }
+
+    /**
+     * 下载文件
+     */
+    public static void downloadFile(Object context, String url, final OnDownloadCallback downloadCallbacl) {
+        load(context).download(url == null ? "" : url).into(new CustomTarget<File>() {
             @Override
             public void onResourceReady(@NonNull File resource, @Nullable Transition<? super File> transition) {
-                downloadCallbacl.onCall(resource);
+                if (downloadCallbacl != null) {
+                    downloadCallbacl.onCall(resource);
+                }
             }
 
             @Override
             public void onLoadFailed(@Nullable Drawable errorDrawable) {
                 super.onLoadFailed(errorDrawable);
-                downloadCallbacl.onCall(null);
+                if (downloadCallbacl != null) {
+                    downloadCallbacl.onCall(null);
+                }
             }
 
             @Override
@@ -185,22 +176,43 @@ public class GlideUtils {
     /**
      * 下载文件
      */
-    public static void getFile(final Context context, final String url, final Target<File> downloadCallbacl) {
-        GlideApp.with(context).asFile().load(url == null ? "" : url).into(downloadCallbacl);
+    public static void getFile(Object context, String url, Target<File> target) {
+        if (target == null) {
+            target = new OnCustomTarget<File>() {
+                @Override
+                public void onResourceReady(@NonNull File resource, @Nullable Transition<? super File> transition) {
+                }
+            };
+        }
+        load(context).asFile().load(url == null ? "" : url).into(target);
     }
 
     /**
      * 下载Bitmap
      */
-    public static void getBitmap(final Context context, final String url, final Target<Bitmap> downloadCallbacl) {
-        GlideApp.with(context).asBitmap().load(url == null ? "" : url).into(downloadCallbacl);
+    public static void getBitmap(Object context, String url, Target<Bitmap> target) {
+        if (target == null) {
+            target = new OnCustomTarget<Bitmap>() {
+                @Override
+                public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                }
+            };
+        }
+        load(context).asBitmap().load(url == null ? "" : url).into(target);
     }
 
     /**
      * 下载Draweable  一般如果不知道是Bitmap还是Drawable就用这个
      */
-    public static void getDrawable(final Context context, final String url, final Target<Drawable> downloadCallbacl) {
-        GlideApp.with(context).asDrawable().load(url == null ? "" : url).into(downloadCallbacl);
+    public static void getDrawable(Object context, final String url, Target<Drawable> target) {
+        if (target == null) {
+            target = new OnCustomTarget<Drawable>() {
+                @Override
+                public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                }
+            };
+        }
+        load(context).asDrawable().load(url == null ? "" : url).into(target);
     }
 
     /**
@@ -284,20 +296,16 @@ public class GlideUtils {
      * @param url
      * @return
      */
-    public static boolean isCache(Context context, String url) {
-        return getCache(context, url) != null;
+    public static boolean isCache(String url) {
+        return getCache(url) != null;
     }
 
     /**
      * 获取缓存文件
      * 只能在子线程
      * onlyRetrieveFromCache 是否只是从缓存中获取
-     *
-     * @param context
-     * @param url
-     * @return
      */
-    public static File getCache(Context context, String url) {
+    public static File getCache(String url) {
         try {
             if (diskLruCacheFactory == null) {
                 diskLruCacheFactory = new InternalCacheDiskCacheFactory(context);
@@ -348,5 +356,20 @@ public class GlideUtils {
             }
         }
         return null;
+    }
+
+    public static GlideRequests load(Object context) {
+        if (context instanceof FragmentActivity) {
+            return GlideApp.with((FragmentActivity) context);
+        } else if (context instanceof Activity) {
+            return GlideApp.with((Activity) context);
+        } else if (context instanceof Fragment) {
+            return GlideApp.with((Fragment) context);
+        } else if (context instanceof ImageView) {
+            return GlideApp.with((ImageView) context);
+        } else if (context instanceof Context) {
+            return GlideApp.with((Context) context);
+        }
+        throw new NullPointerException("context error");
     }
 }
